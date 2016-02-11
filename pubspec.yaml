@@ -1,0 +1,5 @@
+name: revolver
+description: Automatically reloads the app when files change
+dependencies:
+  watcher: "0.9.7"
+  ansicolor: "0.0.9"
