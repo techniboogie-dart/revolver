@@ -2,35 +2,107 @@ import 'dart:isolate';
 import 'dart:io';
 import 'dart:async';
 
-import 'package:ansicolor/ansicolor.dart';
+import 'package:watcher/watcher.dart';
 
-import 'package:revolver/src/file_watcher.dart';
+import 'package:revolver/src/messaging.dart';
+import 'package:revolver/src/reload_throttle.dart' as throttle;
 
-class Configuration {
+void start(RevolverConfiguration config) {
+  printMessage(formatExtensionList(config.extList), label: 'Watch');
+
+  ReceivePort receiver = new ReceivePort();
+  Stream receiverStream = receiver.asBroadcastStream();
+
+  Future<Isolate> _createIsolate() {
+
+    return Isolate.spawnUri(
+      new Uri.file(config.bin, windows: Platform.isWindows),
+      config.binArgs,
+      null)
+    .then((Isolate i) {
+      StreamSubscription streamSub = null;
+
+      streamSub = receiverStream.listen((RevolverAction action) {
+        printMessage(config.bin, label: 'Reload');
+
+        i.kill();
+        streamSub.cancel();
+
+        _createIsolate();
+      });
+    });
+  }
+
+  // Create initial isolate
+  _createIsolate();
+  throttle.startTimer(receiver.sendPort, baseDir: config.baseDir, extList: config.extList, reloadDelayMs: config.reloadDelayMs);
+}
+
+class RevolverConfiguration {
   String baseDir;
   List<String> extList;
   String bin;
   List<String> binArgs;
+  int reloadDelayMs;
 
-  Configuration(this.baseDir, this.extList, this.bin, this.binArgs);
+  RevolverConfiguration(this.bin, {this.binArgs, this.baseDir, this.extList, this.reloadDelayMs});
 }
 
-void start(Configuration config) {
+enum RevolverAction {
+  reload
+}
 
-  print('Watching for changes ${config.extList}');
+enum RevolverEventType {
+  create,
+  modify,
+  delete,
+  move,
+  multi
+}
 
-  Isolate.spawnUri(
-    new Uri.file(config.bin, windows: Platform.isWindows),
-    config.binArgs,
-    null)
-  .then((Isolate i) {
-    getFileChanges(config.baseDir, extList: config.extList)
-    .then((list) {
-      AnsiPen pen = new AnsiPen()
-      ..yellow(bold: true);
-      print('${pen("looking yellow")}');
-    });
-    //    kill watch and isolate. startIsolate()
+class RevolverEvent {
+  RevolverEventType type;
+  String filePath;
 
-  });
+  RevolverEvent.fromFileSystemEvent(FileSystemEvent evt) {
+    filePath = evt.path;
+    type = _getEventType(evt);
+  }
+
+  RevolverEvent.fromWatchEvent(WatchEvent evt) {
+    filePath = evt.path;
+    type = _getEventTypeFromWatchEvent(evt);
+  }
+
+  RevolverEventType _getEventType(FileSystemEvent evt) {
+
+    switch(evt.type) {
+      case FileSystemEvent.ALL:
+        return RevolverEventType.multi;
+      case FileSystemEvent.MODIFY:
+        return RevolverEventType.modify;
+      case FileSystemEvent.CREATE:
+        return RevolverEventType.create;
+      case FileSystemEvent.DELETE:
+        return RevolverEventType.delete;
+      case FileSystemEvent.MOVE:
+        return RevolverEventType.move;
+      default:
+        return null;
+    }
+  }
+
+  RevolverEventType _getEventTypeFromWatchEvent(WatchEvent evt) {
+
+    switch(evt.type) {
+      case ChangeType.ADD:
+        return RevolverEventType.create;
+      case ChangeType.MODIFY:
+        return RevolverEventType.modify;
+      case ChangeType.REMOVE:
+        return RevolverEventType.delete;
+      default:
+        return null;
+    }
+  }
 }

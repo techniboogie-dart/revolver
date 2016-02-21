@@ -1,5 +1,11 @@
 name: revolver
-description: Automatically reloads the app when files change
+version: 1.0.0
+description: Automatically reloads the application when file changes are detected, much like Nodemon.
+author: Keith Elliott
+homepage: https://github.com/techniboogie/revolver
+documentation:
+executables:
+  revolver:
 dependencies:
-  watcher: "0.9.7"
-  ansicolor: "0.0.9"
+  watcher: ^0.9.7
+  ansicolor: ^0.0.9
