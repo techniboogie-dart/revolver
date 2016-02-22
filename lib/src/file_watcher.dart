@@ -5,6 +5,7 @@ import 'package:watcher/watcher.dart';
 
 import 'package:revolver/revolver.dart' as revolver;
 
+/// A wrapper around a [StreamController].
 class DirectorWatcher {
   StreamController<revolver.RevolverEvent> _streamController;
 
@@ -47,6 +48,7 @@ bool _isRequestedExtension(String filePath, {List<String> requestedExtensions}) 
   return false;
 }
 
+/// Streams all non-filtered [RevolverEvent].
 Stream<revolver.RevolverEvent> getFileChanges({String path, List<String> extList, bool usePolling: false}) {
   Directory dir = null;
 

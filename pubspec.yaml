@@ -9,3 +9,4 @@ executables:
 dependencies:
   watcher: ^0.9.7
   ansicolor: ^0.0.9
+  args: ^0.13.3

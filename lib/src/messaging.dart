@@ -9,6 +9,7 @@ const String _moveLabel = 'Moved';
 const String _multiLabel = '${_createLabel}/${_modifyLabel}/${_deleteLabel}';
 const String _unknownLabel = 'Unknown';
 
+/// Prints message, prefixed with an optional BLUE label.
 void printMessage(String message, {String label}) {
 
   if (label != null) {
@@ -17,6 +18,7 @@ void printMessage(String message, {String label}) {
   print(message);
 }
 
+/// Prints the details of a [RevolverEvent], using the appropriate color.
 void printEvent(RevolverEvent event) {
   String coloredLabel = null;
 
@@ -44,6 +46,7 @@ void printEvent(RevolverEvent event) {
   print('${coloredLabel}  ${event.filePath}');
 }
 
+/// Prints an error message in RED.
 void printError(String message) {
   print(_getPen(Color.bigRed)(message));
 }
@@ -84,8 +87,9 @@ AnsiPen _getPen(Color color) {
   }
 }
 
+/// Formats a list of file extensions for display.
 String formatExtensionList(List<String> extensions) {
   return extensions
-  .map((String extension) => '*.' + extension)
-  .join(' ');
+  ?.map((String extension) => '*.' + extension)
+  ?.join(' ');
 }

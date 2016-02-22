@@ -7,8 +7,15 @@ import 'package:watcher/watcher.dart';
 import 'package:revolver/src/messaging.dart';
 import 'package:revolver/src/reload_throttle.dart' as throttle;
 
+/// Runs and monitors the dart application, using the the supplied [RevolverConfiguration]
+///
+/// Creates an isolate that is managed by the [reload_throttle].[startTimer]
 void start(RevolverConfiguration config) {
-  printMessage(formatExtensionList(config.extList), label: 'Watch');
+  printMessage(config.bin, label: 'Start');
+
+  if (config.extList != null) {
+    printMessage(formatExtensionList(config.extList), label: 'Watch');
+  }
 
   ReceivePort receiver = new ReceivePort();
   Stream receiverStream = receiver.asBroadcastStream();
@@ -35,17 +42,31 @@ void start(RevolverConfiguration config) {
 
   // Create initial isolate
   _createIsolate();
-  throttle.startTimer(receiver.sendPort, baseDir: config.baseDir, extList: config.extList, reloadDelayMs: config.reloadDelayMs);
+  throttle.startTimer(
+    receiver.sendPort,
+    baseDir: config.baseDir,
+    extList: config.extList,
+    reloadDelayMs: config.reloadDelayMs,
+    usePolling: config.usePolling
+  );
 }
 
+/// The configuration for the initial loading of revolver. See [start]
 class RevolverConfiguration {
   String baseDir;
   List<String> extList;
   String bin;
   List<String> binArgs;
   int reloadDelayMs;
+  bool usePolling;
 
-  RevolverConfiguration(this.bin, {this.binArgs, this.baseDir, this.extList, this.reloadDelayMs});
+  RevolverConfiguration(this.bin, {
+    this.binArgs,
+    this.baseDir: '.',
+    this.extList,
+    this.reloadDelayMs: 500,
+    this.usePolling: false
+  });
 }
 
 enum RevolverAction {
@@ -60,15 +81,18 @@ enum RevolverEventType {
   multi
 }
 
+/// The exception that is thrown when a file event occurs.
 class RevolverEvent {
   RevolverEventType type;
   String filePath;
 
+  /// Creates a [RevolverEvent] from a [FileSystemEvent]
   RevolverEvent.fromFileSystemEvent(FileSystemEvent evt) {
     filePath = evt.path;
     type = _getEventType(evt);
   }
 
+  /// Creates a [RevolverEvent] from a [WatchEvent]
   RevolverEvent.fromWatchEvent(WatchEvent evt) {
     filePath = evt.path;
     type = _getEventTypeFromWatchEvent(evt);
