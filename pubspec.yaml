@@ -1,5 +1,5 @@
 name: revolver
-version: 1.0.0
+version: 1.0.1
 description: Automatically reloads the application when file changes are detected, much like Nodemon.
 author: Keith Elliott <keith.b.elliott@gmail.com>
 homepage: https://github.com/techniboogie/revolver
