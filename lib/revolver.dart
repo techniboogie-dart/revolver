@@ -25,7 +25,9 @@ void start(RevolverConfiguration config) {
     return Isolate.spawnUri(
       new Uri.file(config.bin, windows: Platform.isWindows),
       config.binArgs,
-      null)
+      null,
+      automaticPackageResolution: true
+    )
     .then((Isolate i) {
       StreamSubscription streamSub = null;
 
