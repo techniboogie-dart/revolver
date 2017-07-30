@@ -10,11 +10,15 @@ import 'package:revolver/src/reload_throttle.dart' as throttle;
 /// Runs and monitors the dart application, using the the supplied [RevolverConfiguration]
 ///
 /// Creates an isolate that is managed by the [reload_throttle].[startTimer]
-void start(RevolverConfiguration config) {
-  printMessage(config.bin, label: 'Start');
+void start() {
+  String bin = RevolverConfiguration.bin;
+  List<String> extList = RevolverConfiguration.extList;
+  List<String> binArgs = RevolverConfiguration.binArgs;
 
-  if (config.extList != null) {
-    printMessage(formatExtensionList(config.extList), label: 'Watch');
+  printMessage(bin, label: 'Start');
+
+  if (extList != null) {
+    printMessage(formatExtensionList(extList), label: 'Watch');
   }
 
   ReceivePort receiver = new ReceivePort();
@@ -23,8 +27,8 @@ void start(RevolverConfiguration config) {
   Future<Isolate> _createIsolate() {
 
     return Isolate.spawnUri(
-      new Uri.file(config.bin, windows: Platform.isWindows),
-      config.binArgs,
+      new Uri.file(bin, windows: Platform.isWindows),
+      binArgs,
       null,
       automaticPackageResolution: true
     )
@@ -32,7 +36,7 @@ void start(RevolverConfiguration config) {
       StreamSubscription streamSub = null;
 
       streamSub = receiverStream.listen((RevolverAction action) {
-        printMessage(config.bin, label: 'Reload');
+        printMessage(bin, label: 'Reload');
 
         i.kill();
         streamSub.cancel();
@@ -44,31 +48,38 @@ void start(RevolverConfiguration config) {
 
   // Create initial isolate
   _createIsolate();
-  throttle.startTimer(
-    receiver.sendPort,
-    baseDir: config.baseDir,
-    extList: config.extList,
-    reloadDelayMs: config.reloadDelayMs,
-    usePolling: config.usePolling
-  );
+  throttle.startTimer(receiver.sendPort);
 }
 
 /// The configuration for the initial loading of revolver. See [start]
 class RevolverConfiguration {
-  String baseDir;
-  List<String> extList;
-  String bin;
-  List<String> binArgs;
-  int reloadDelayMs;
-  bool usePolling;
+  static String bin;
+  static List<String> binArgs;
+  static String baseDir;
+  static List<String> extList;
+  static int reloadDelayMs;
+  static bool usePolling;
+  static bool isGitProject;
+  static bool doIgnoreDart;
 
-  RevolverConfiguration(this.bin, {
-    this.binArgs,
-    this.baseDir: '.',
-    this.extList,
-    this.reloadDelayMs: 500,
-    this.usePolling: false
-  });
+  static initialize(bin, {
+    binArgs,
+    baseDir: '.',
+    extList,
+    reloadDelayMs: 500,
+    usePolling: false,
+    isGitProject: false,
+    doIgnoreDart: true
+  }) {
+    RevolverConfiguration.bin = bin;
+    RevolverConfiguration.binArgs = binArgs;
+    RevolverConfiguration.baseDir = baseDir;
+    RevolverConfiguration.extList = extList;
+    RevolverConfiguration.reloadDelayMs = reloadDelayMs;
+    RevolverConfiguration.usePolling = usePolling;
+    RevolverConfiguration.isGitProject = isGitProject;
+    RevolverConfiguration.doIgnoreDart = doIgnoreDart;
+  }
 }
 
 enum RevolverAction {

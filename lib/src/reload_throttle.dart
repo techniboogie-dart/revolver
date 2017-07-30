@@ -6,13 +6,15 @@ import 'package:revolver/src/messaging.dart';
 import 'package:revolver/revolver.dart' as revolver;
 
 /// Manages the reloading of the of the application isolate.
-Future startTimer(SendPort sender, {String baseDir, List<String> extList, int reloadDelayMs, bool usePolling}) async {
+Future startTimer(SendPort sender) async {
+  int reloadDelayMs = revolver.RevolverConfiguration.reloadDelayMs;
+
   Duration _quietTime = new Duration(milliseconds: reloadDelayMs);
   Timer quietTimeCheck = null;
   // Track files, only show each file once between resets
   Set<String> fileList = new Set<String>();
 
-  await for (revolver.RevolverEvent evt in getFileChanges(path: baseDir, extList: extList, usePolling: usePolling)) {
+  await for (revolver.RevolverEvent evt in getFileChanges()) {
     String filePath = evt.filePath;
 
     if (!fileList.contains(filePath)) {

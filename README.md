@@ -4,15 +4,22 @@ _Check the documentation for extra functionality using the API._
 
 Revolver was influenced by [Nodemon](https://github.com/remy/nodemon).
 
-### Usage
-    revolver [OPTIONS] APPLICATION.dart [PARAMS ...]
+### Installation ###
+    pub global activate revolver
 
+### Usage ###
+###### revolver _[options...]_ application _[application arguments...]_ ######
 
-###### Options
-__--ext, -e__
+    $ revolver --help
+    -e, --ext                 Watch only the specified extensions.
+    -p, --use-polling         Using file polling, rather than file system events, to detect file changes.
+    -h, --help                Displays this help information.
+    -g, --git                 Git project. Ignores git files and respects the contents of .gitignore.
+    -d, --[no-]ignore-dart    Ignore dart project files.
+                              (defaults to on)
 
-Watch only the specified extensions: `--ext="dart,yaml,conf"`
+### Examples ###
 
-__--use-polling, -p__  
+    $ revolver --ext="dart,yaml,conf" application.dart
 
-Using file polling, rather than file system events, to detect file changes.
+    $ revolver --git bin/server.dart -p 8080
