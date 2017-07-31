@@ -98,17 +98,20 @@ enum RevolverEventType {
 class RevolverEvent {
   RevolverEventType type;
   String filePath;
+  String basePath;
 
   /// Creates a [RevolverEvent] from a [FileSystemEvent]
   RevolverEvent.fromFileSystemEvent(FileSystemEvent evt) {
-    filePath = evt.path;
-    type = _getEventType(evt);
+    this.filePath = evt.path;
+    this.type = _getEventType(evt);
+    this.basePath = basePath;
   }
 
   /// Creates a [RevolverEvent] from a [WatchEvent]
   RevolverEvent.fromWatchEvent(WatchEvent evt) {
-    filePath = evt.path;
-    type = _getEventTypeFromWatchEvent(evt);
+    this.filePath = evt.path;
+    this.type = _getEventTypeFromWatchEvent(evt);
+    this.basePath = basePath;
   }
 
   RevolverEventType _getEventType(FileSystemEvent evt) {
@@ -141,5 +144,20 @@ class RevolverEvent {
       default:
         return null;
     }
+  }
+
+  get cleanPath {
+    String basePath;
+
+    if (RevolverConfiguration.baseDir) {
+      basePath = new Directory(RevolverConfiguration.baseDir).path;
+    }
+    else {
+      basePath = Directory.current.path;
+    }
+
+
+    print(filePath.replaceAll(basePath, ''));
+    return filePath.replaceAll(basePath, '');
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:ansicolor/ansicolor.dart';
 
 import 'package:revolver/revolver.dart';
@@ -13,37 +15,41 @@ const String _unknownLabel = 'Unknown';
 void printMessage(String message, {String label}) {
 
   if (label != null) {
-    message = '${_getPen(Color.blue)(label + ".")}  ${message}';
+    message = _formatMessage(Color.blue, '${label}.', message);
   }
   print(message);
 }
 
 /// Prints the details of a [RevolverEvent], using the appropriate color.
 void printEvent(RevolverEvent event) {
-  String coloredLabel = null;
+  String message;
 
   switch(event.type) {
     case RevolverEventType.create:
-      coloredLabel = _getPen(Color.green)(_createLabel + '.');
+      message = _formatMessage(Color.green, '${_createLabel}.', event.filePath);
       break;
     case RevolverEventType.modify:
-      coloredLabel = _getPen(Color.yellow)(_modifyLabel + '.');
+      message = _formatMessage(Color.yellow, '${_modifyLabel}.', event.filePath);
       break;
     case RevolverEventType.move:
-      coloredLabel = _getPen(Color.orange)(_moveLabel + '.');
+      message = _formatMessage(Color.orange, '${_moveLabel}.', event.filePath);
       break;
     case RevolverEventType.delete:
-      coloredLabel = _getPen(Color.red)(_deleteLabel + '.');
+      message = _formatMessage(Color.red, '${_deleteLabel}.', event.filePath);
       break;
     case RevolverEventType.multi:
-      coloredLabel = _getPen(Color.purple)(_multiLabel + '.');
+      message = _formatMessage(Color.purple, '${_multiLabel}.', event.filePath);
       break;
     default:
-      coloredLabel = _getPen(Color.grey)(_unknownLabel + '.');
+      message = _formatMessage(Color.grey, '${_unknownLabel}.', event.filePath);
       break;
   }
+  print(message);
+}
 
-  print('${coloredLabel}  ${event.filePath}');
+String _formatMessage(Color labelColor, String label, String message) {
+  label = label.padRight(12);
+  return '${_getPen(labelColor)(label)} ${convertToRelativePath(message)}';
 }
 
 /// Prints an error message in RED.
@@ -92,4 +98,19 @@ String formatExtensionList(List<String> extensions) {
   return extensions
   ?.map((String extension) => '*.' + extension)
   ?.join(' ');
+}
+
+String convertToRelativePath(filePath) {
+  String basePath;
+
+  if (RevolverConfiguration.baseDir != null) {
+    basePath = new Directory(RevolverConfiguration.baseDir).path;
+  }
+  else {
+    basePath = Directory.current.path;
+  }
+
+  basePath = '${basePath}${Platform.pathSeparator}';
+
+  return filePath.replaceAll(basePath, '');
 }
