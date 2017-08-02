@@ -145,19 +145,4 @@ class RevolverEvent {
         return null;
     }
   }
-
-  get cleanPath {
-    String basePath;
-
-    if (RevolverConfiguration.baseDir) {
-      basePath = new Directory(RevolverConfiguration.baseDir).path;
-    }
-    else {
-      basePath = Directory.current.path;
-    }
-
-
-    print(filePath.replaceAll(basePath, ''));
-    return filePath.replaceAll(basePath, '');
-  }
 }
