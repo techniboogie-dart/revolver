@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:revolver/revolver.dart' show RevolverConfiguration;
 import 'package:revolver/src/project_template.dart';
+import 'package:revolver/src/file_util.dart';
 
 final ProjectTemplate _gitProject = new GitProjectTemplate('.gitignore', ['.git/**']);
 final ProjectTemplate _dartProject = new DartProjectTemplate();
@@ -40,5 +41,6 @@ bool _checkIsIgnoredFile(String filePath) {
 }
 
 checkDoWatchFile(filePath) {
+  filePath = convertToRelativePath(filePath);
   return _checkIsRequestedExtension(filePath) && !_checkIsIgnoredFile(filePath);
 }

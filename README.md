@@ -12,11 +12,17 @@ Revolver was influenced by [Nodemon](https://github.com/remy/nodemon).
 
     $ revolver --help
     -e, --ext                 Watch only the specified extensions.
+    -w, --working-dir         Overrides the current working directory,.
+                              (defaults to "/files/projects/dart/revolver")
+
     -p, --use-polling         Using file polling, rather than file system events, to detect file changes.
     -h, --help                Displays this help information.
-    -g, --git                 Git project. Ignores git files and respects the contents of .gitignore.
+    -g, --[no-]git            Ignores git files and respects the contents of .gitignore.
+                              (defaults to on)
+
     -d, --[no-]ignore-dart    Ignore dart project files.
                               (defaults to on)
+
 
 ### Examples ###
 

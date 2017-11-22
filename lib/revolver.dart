@@ -22,32 +22,41 @@ void start() {
   }
 
   ReceivePort receiver = new ReceivePort();
+  ReceivePort errorReceiver = new ReceivePort();
+
   Stream receiverStream = receiver.asBroadcastStream();
+  Stream errorReceiverStream = errorReceiver.asBroadcastStream();
 
-  Future<Isolate> _createIsolate() {
+  Isolate process = null;
 
-    return Isolate.spawnUri(
+  Future<Isolate> createIsolate() async {
+    // Kill previous process.
+    process?.kill(priority: Isolate.IMMEDIATE);
+
+    process = await Isolate.spawnUri(
       new Uri.file(bin, windows: Platform.isWindows),
       binArgs,
       null,
-      automaticPackageResolution: true
-    )
-    .then((Isolate i) {
-      StreamSubscription streamSub = null;
+      automaticPackageResolution: true,
+      errorsAreFatal: true,
+      onError: errorReceiver.sendPort
+    );
 
-      streamSub = receiverStream.listen((RevolverAction action) {
-        printMessage(bin, label: 'Reload');
-
-        i.kill();
-        streamSub.cancel();
-
-        _createIsolate();
-      });
-    });
+    return process;
   }
 
+  receiverStream.listen((RevolverAction action) {
+    printMessage(bin, label: 'Reload');
+    createIsolate();
+  });
+
+  errorReceiverStream.listen((errors) {
+    printError('Process failed. Will try again on next file change.');
+    printMessage(errors);
+  });
+
   // Create initial isolate
-  _createIsolate();
+  createIsolate();
   throttle.startTimer(receiver.sendPort);
 }
 
@@ -98,20 +107,17 @@ enum RevolverEventType {
 class RevolverEvent {
   RevolverEventType type;
   String filePath;
-  String basePath;
 
   /// Creates a [RevolverEvent] from a [FileSystemEvent]
   RevolverEvent.fromFileSystemEvent(FileSystemEvent evt) {
     this.filePath = evt.path;
     this.type = _getEventType(evt);
-    this.basePath = basePath;
   }
 
   /// Creates a [RevolverEvent] from a [WatchEvent]
   RevolverEvent.fromWatchEvent(WatchEvent evt) {
     this.filePath = evt.path;
     this.type = _getEventTypeFromWatchEvent(evt);
-    this.basePath = basePath;
   }
 
   RevolverEventType _getEventType(FileSystemEvent evt) {

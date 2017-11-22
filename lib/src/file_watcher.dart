@@ -39,7 +39,7 @@ Stream<revolver.RevolverEvent> getFileChanges() {
 
   Directory dir = null;
 
-  if (baseDir?.length > 0) {
+  if (baseDir != null && baseDir.length > 0) {
     dir = new Directory(baseDir);
   }
   else {

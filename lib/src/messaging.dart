@@ -1,13 +1,13 @@
-import 'dart:io';
-
 import 'package:ansicolor/ansicolor.dart';
 
 import 'package:revolver/revolver.dart';
+import 'package:revolver/src/file_util.dart';
 
 const String _modifyLabel = 'Modified';
 const String _createLabel = 'New File';
 const String _deleteLabel = 'Deleted';
 const String _moveLabel = 'Moved';
+const String _errorLabel = 'Error';
 const String _multiLabel = '${_createLabel}/${_modifyLabel}/${_deleteLabel}';
 const String _unknownLabel = 'Unknown';
 
@@ -98,19 +98,4 @@ String formatExtensionList(List<String> extensions) {
   return extensions
   ?.map((String extension) => '*.' + extension)
   ?.join(' ');
-}
-
-String convertToRelativePath(filePath) {
-  String basePath;
-
-  if (RevolverConfiguration.baseDir != null) {
-    basePath = new Directory(RevolverConfiguration.baseDir).path;
-  }
-  else {
-    basePath = Directory.current.path;
-  }
-
-  basePath = '${basePath}${Platform.pathSeparator}';
-
-  return filePath.replaceAll(basePath, '');
 }
