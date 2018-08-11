@@ -17,15 +17,14 @@ class DirectorWatcher {
   }
 
   void _watch(Directory dir) {
-
-    dir.watch(events: FileSystemEvent.ALL)
-    .listen((FileSystemEvent evt) {
+    dir.watch(events: FileSystemEvent.all).listen((FileSystemEvent evt) {
       // Watch new directories
-      if (evt.isDirectory && evt.type == FileSystemEvent.CREATE) {
+      if (evt.isDirectory && evt.type == FileSystemEvent.create) {
         _watch(new Directory(evt.path));
       }
 
-      _streamController.add(new revolver.RevolverEvent.fromFileSystemEvent(evt));
+      _streamController
+          .add(new revolver.RevolverEvent.fromFileSystemEvent(evt));
     });
   }
 
@@ -41,42 +40,44 @@ Stream<revolver.RevolverEvent> getFileChanges() {
 
   if (baseDir != null && baseDir.length > 0) {
     dir = new Directory(baseDir);
-  }
-  else {
+  } else {
     dir = Directory.current;
   }
 
   if (usePolling) {
-    return new DirectoryWatcher(dir.path).events
-      .where((WatchEvent evt) => checkDoWatchFile(evt.path))
-      .map((WatchEvent evt) => new revolver.RevolverEvent.fromWatchEvent(evt));
+    return new DirectoryWatcher(dir.path)
+        .events
+        .where((WatchEvent evt) => checkDoWatchFile(evt.path))
+        .map(
+            (WatchEvent evt) => new revolver.RevolverEvent.fromWatchEvent(evt));
   }
 
-  StreamController<revolver.RevolverEvent> streamController = new StreamController<revolver.RevolverEvent>();
+  StreamController<revolver.RevolverEvent> streamController =
+      new StreamController<revolver.RevolverEvent>();
 
   watchDirectory(dir, streamController);
 
   // Linux doesn't support the recursive directory watch. This method
   // should catch all platforms
-  dir.list(recursive: true, followLinks: true)
-    .where((FileSystemEntity entity) {
-      FileStat stat = entity.statSync();
-      return stat.type == FileSystemEntityType.DIRECTORY;
-    })
-    .map((FileSystemEntity entity) => entity as Directory)
-    .listen((Directory dir) {
-      watchDirectory(dir, streamController);
-    });
+  dir
+      .list(recursive: true, followLinks: true)
+      .where((FileSystemEntity entity) {
+        FileStat stat = entity.statSync();
+        return stat.type == FileSystemEntityType.directory;
+      })
+      .map((FileSystemEntity entity) => entity as Directory)
+      .listen((Directory dir) {
+        watchDirectory(dir, streamController);
+      });
 
-    return streamController.stream;
+  return streamController.stream;
 }
 
 void watchDirectory(Directory dir, StreamController sharedStreamController) {
-
   DirectorWatcher dirWatcher = new DirectorWatcher(dir);
 
   dirWatcher.stream
-  .where((revolver.RevolverEvent evt) => sharedStreamController.hasListener)
-  .where((revolver.RevolverEvent evt) => checkDoWatchFile(evt.filePath))
-  .listen((revolver.RevolverEvent evt) => sharedStreamController.add(evt));
+      .where((revolver.RevolverEvent evt) => sharedStreamController.hasListener)
+      .where((revolver.RevolverEvent evt) => checkDoWatchFile(evt.filePath))
+      .listen((revolver.RevolverEvent evt) => sharedStreamController.add(evt));
 }

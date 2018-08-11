@@ -1,15 +1,15 @@
 name: revolver
-version: 1.3.0
+version: 2.0.0
 description: Automatically reloads the application when file changes are detected, much like Nodemon.
 author: Keith Elliott <keith.b.elliott@gmail.com>
 homepage: https://github.com/techniboogie-dart/revolver
 documentation:
 environment:
-  sdk: ">=1.24.0"
+  sdk: ">=1.24.0 <3.0.0"
 executables:
   revolver:
 dependencies:
-  watcher: '>=0.9.7 <0.10.0'
-  args: '>=0.13.3 <0.14.0'
-  ansicolor: '>=0.0.9 <0.1.0'
-  glob: '>=1.1.0 <1.2.0 '
+  watcher: '^0.9.7'
+  args: '^1.5.0'
+  ansicolor: '^1.0.2'
+  glob: '^1.1.7'

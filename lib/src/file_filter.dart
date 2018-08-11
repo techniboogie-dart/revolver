@@ -4,7 +4,8 @@ import 'package:revolver/revolver.dart' show RevolverConfiguration;
 import 'package:revolver/src/project_template.dart';
 import 'package:revolver/src/file_util.dart';
 
-final ProjectTemplate _gitProject = new GitProjectTemplate('.gitignore', ['.git/**']);
+final ProjectTemplate _gitProject =
+    new GitProjectTemplate('.gitignore', ['.git/**']);
 final ProjectTemplate _dartProject = new DartProjectTemplate();
 
 bool _checkIsRequestedExtension(String filePath) {
@@ -18,9 +19,8 @@ bool _checkIsRequestedExtension(String filePath) {
   }
 
   for (String ext in requestedExtensions) {
-
     if (filePath.endsWith('.${ext}')) {
-        return true;
+      return true;
     }
   }
   return false;
@@ -37,7 +37,8 @@ bool _checkIsIgnoredFile(String filePath) {
     projectTemplates.add(_dartProject);
   }
 
-  return projectTemplates.any((projectTemplate) => projectTemplate.checkIgnoreFile(filePath));
+  return projectTemplates
+      .any((projectTemplate) => projectTemplate.checkIgnoreFile(filePath));
 }
 
 checkDoWatchFile(filePath) {

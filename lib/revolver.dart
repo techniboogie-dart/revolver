@@ -24,23 +24,20 @@ void start() {
   ReceivePort receiver = new ReceivePort();
   ReceivePort errorReceiver = new ReceivePort();
 
-  Stream receiverStream = receiver.asBroadcastStream();
+  Stream<RevolverAction> receiverStream = receiver.asBroadcastStream();
   Stream errorReceiverStream = errorReceiver.asBroadcastStream();
 
   Isolate process = null;
 
   Future<Isolate> createIsolate() async {
     // Kill previous process.
-    process?.kill(priority: Isolate.IMMEDIATE);
+    process?.kill(priority: Isolate.immediate);
 
     process = await Isolate.spawnUri(
-      new Uri.file(bin, windows: Platform.isWindows),
-      binArgs,
-      null,
-      automaticPackageResolution: true,
-      errorsAreFatal: true,
-      onError: errorReceiver.sendPort
-    );
+        new Uri.file(bin, windows: Platform.isWindows), binArgs, null,
+        automaticPackageResolution: true,
+        errorsAreFatal: true,
+        onError: errorReceiver.sendPort);
 
     return process;
   }
@@ -71,15 +68,14 @@ class RevolverConfiguration {
   static bool isGitProject;
   static bool doIgnoreDart;
 
-  static initialize(bin, {
-    binArgs,
-    baseDir: '.',
-    extList,
-    reloadDelayMs: 500,
-    usePolling: false,
-    isGitProject: false,
-    doIgnoreDart: true
-  }) {
+  static initialize(bin,
+      {binArgs,
+      baseDir: '.',
+      extList,
+      reloadDelayMs: 500,
+      usePolling: false,
+      isGitProject: false,
+      doIgnoreDart: true}) {
     RevolverConfiguration.bin = bin;
     RevolverConfiguration.binArgs = binArgs;
     RevolverConfiguration.baseDir = baseDir;
@@ -91,17 +87,9 @@ class RevolverConfiguration {
   }
 }
 
-enum RevolverAction {
-  reload
-}
+enum RevolverAction { reload }
 
-enum RevolverEventType {
-  create,
-  modify,
-  delete,
-  move,
-  multi
-}
+enum RevolverEventType { create, modify, delete, move, multi }
 
 /// The exception that is thrown when a file event occurs.
 class RevolverEvent {
@@ -121,17 +109,16 @@ class RevolverEvent {
   }
 
   RevolverEventType _getEventType(FileSystemEvent evt) {
-
-    switch(evt.type) {
-      case FileSystemEvent.ALL:
+    switch (evt.type) {
+      case FileSystemEvent.all:
         return RevolverEventType.multi;
-      case FileSystemEvent.MODIFY:
+      case FileSystemEvent.modify:
         return RevolverEventType.modify;
-      case FileSystemEvent.CREATE:
+      case FileSystemEvent.create:
         return RevolverEventType.create;
-      case FileSystemEvent.DELETE:
+      case FileSystemEvent.delete:
         return RevolverEventType.delete;
-      case FileSystemEvent.MOVE:
+      case FileSystemEvent.move:
         return RevolverEventType.move;
       default:
         return null;
@@ -139,8 +126,7 @@ class RevolverEvent {
   }
 
   RevolverEventType _getEventTypeFromWatchEvent(WatchEvent evt) {
-
-    switch(evt.type) {
+    switch (evt.type) {
       case ChangeType.ADD:
         return RevolverEventType.create;
       case ChangeType.MODIFY:

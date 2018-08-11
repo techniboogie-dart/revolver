@@ -6,12 +6,35 @@ import 'package:revolver/revolver.dart' as revolver;
 
 void main(List<String> args) {
   ArgParser parser = new ArgParser();
-  parser.addOption('ext', abbr: 'e', defaultsTo: null, help: 'Watch only the specified extensions.');
-  parser.addOption('working-dir', abbr: 'w', defaultsTo: Directory.current.path, help: 'Overrides the current working directory,.');
-  parser.addFlag('use-polling', abbr: 'p', negatable: false, defaultsTo: false, help: 'Using file polling, rather than file system events, to detect file changes.');
-  parser.addFlag('help', abbr: 'h', negatable: false, defaultsTo: false, help: 'Displays this help information.');
-  parser.addFlag('git', abbr: 'g', negatable: true, defaultsTo: true, help: 'Ignores git files and respects the contents of .gitignore.');
-  parser.addFlag('ignore-dart', abbr: 'd', negatable: true, defaultsTo: true, help: 'Ignore dart project files.');
+  parser.addOption('ext',
+      abbr: 'e',
+      defaultsTo: null,
+      help: 'Watch only the specified extensions.');
+  parser.addOption('working-dir',
+      abbr: 'w',
+      defaultsTo: Directory.current.path,
+      help: 'Overrides the current working directory,.');
+  parser.addFlag('use-polling',
+      abbr: 'p',
+      negatable: false,
+      defaultsTo: false,
+      help:
+          'Using file polling, rather than file system events, to detect file changes.');
+  parser.addFlag('help',
+      abbr: 'h',
+      negatable: false,
+      defaultsTo: false,
+      help: 'Displays this help information.');
+  parser.addFlag('git',
+      abbr: 'g',
+      negatable: true,
+      defaultsTo: true,
+      help: 'Ignores git files and respects the contents of .gitignore.');
+  parser.addFlag('ignore-dart',
+      abbr: 'd',
+      negatable: true,
+      defaultsTo: true,
+      help: 'Ignore dart project files.');
 
   ArgResults results = parser.parse(args);
 
@@ -30,15 +53,13 @@ void main(List<String> args) {
     bin = Directory.current.path + Platform.pathSeparator + bin;
   }
 
-  revolver.RevolverConfiguration.initialize(
-    bin,
-    binArgs: params,
-    baseDir: results['working-dir'],
-    extList: results['ext']?.split(',')?.map((value) => value.trim()),
-    usePolling: results['use-polling'],
-    isGitProject: results['git'],
-    doIgnoreDart: results['ignore-dart'] 
-  );
+  revolver.RevolverConfiguration.initialize(bin,
+      binArgs: params,
+      baseDir: results['working-dir'],
+      extList: results['ext']?.split(',')?.map((value) => value.trim()),
+      usePolling: results['use-polling'],
+      isGitProject: results['git'],
+      doIgnoreDart: results['ignore-dart']);
 
   revolver.start();
 }

@@ -7,13 +7,11 @@ const String _modifyLabel = 'Modified';
 const String _createLabel = 'New File';
 const String _deleteLabel = 'Deleted';
 const String _moveLabel = 'Moved';
-const String _errorLabel = 'Error';
 const String _multiLabel = '${_createLabel}/${_modifyLabel}/${_deleteLabel}';
 const String _unknownLabel = 'Unknown';
 
 /// Prints message, prefixed with an optional BLUE label.
 void printMessage(String message, {String label}) {
-
   if (label != null) {
     message = _formatMessage(Color.blue, '${label}.', message);
   }
@@ -24,12 +22,13 @@ void printMessage(String message, {String label}) {
 void printEvent(RevolverEvent event) {
   String message;
 
-  switch(event.type) {
+  switch (event.type) {
     case RevolverEventType.create:
       message = _formatMessage(Color.green, '${_createLabel}.', event.filePath);
       break;
     case RevolverEventType.modify:
-      message = _formatMessage(Color.yellow, '${_modifyLabel}.', event.filePath);
+      message =
+          _formatMessage(Color.yellow, '${_modifyLabel}.', event.filePath);
       break;
     case RevolverEventType.move:
       message = _formatMessage(Color.orange, '${_moveLabel}.', event.filePath);
@@ -57,16 +56,7 @@ void printError(String message) {
   print(_getPen(Color.bigRed)(message));
 }
 
-enum Color {
-  green,
-  yellow,
-  red,
-  blue,
-  bigRed,
-  purple,
-  orange,
-  grey
-}
+enum Color { green, yellow, red, blue, bigRed, purple, orange, grey }
 
 AnsiPen _getPen(Color color) {
   AnsiPen pen = new AnsiPen();
@@ -95,7 +85,5 @@ AnsiPen _getPen(Color color) {
 
 /// Formats a list of file extensions for display.
 String formatExtensionList(List<String> extensions) {
-  return extensions
-  ?.map((String extension) => '*.' + extension)
-  ?.join(' ');
+  return extensions?.map((String extension) => '*.' + extension)?.join(' ');
 }

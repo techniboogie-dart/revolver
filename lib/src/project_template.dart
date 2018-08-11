@@ -17,8 +17,8 @@ class GitProjectTemplate implements ProjectTemplate {
     }
 
     this.ignoreFileGlobs = globFileExpressions
-    .where((fileExp) => fileExp.trim().length > 0)
-    .map((file) {
+        .where((fileExp) => fileExp.trim().length > 0)
+        .map((file) {
       return new Glob(file);
     });
   }
@@ -35,7 +35,6 @@ class DartProjectTemplate implements ProjectTemplate {
   ];
 
   bool checkIgnoreFile(String filePath) {
-
     return ignoreFileGlobs.any((glob) {
       glob.matches(filePath);
     });

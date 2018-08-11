@@ -7,8 +7,7 @@ String convertToRelativePath(filePath) {
 
   if (RevolverConfiguration.baseDir != null) {
     basePath = new Directory(RevolverConfiguration.baseDir).path;
-  }
-  else {
+  } else {
     basePath = Directory.current.path;
   }
 

@@ -2,6 +2,7 @@
 .atom
 .packages
 .pub
+.pub-cache
 build
 **/packages
 **/*~
